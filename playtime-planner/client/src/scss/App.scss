@@ -1,0 +1,61 @@
+body {
+  overflow: hidden;
+}
+
+.friends-body {
+  overflow-y: scroll;
+}
+
+.friends-card {
+  height: 89vh;
+  margin: 1.3%;
+}
+
+.game-night {
+  width: 40rem;
+}
+
+.secure-svg {
+  left: 50%;
+  top: 50.71%;
+}
+
+.signup-form-form {
+  height: 23.4rem;
+}
+
+.login-form-form {
+  height: 19rem;
+}
+
+.lost-svg {
+  width: 80rem;
+  min-width: 60rem;
+  left: 39%;
+  top: 31.71%;
+}
+
+.home-card {
+  height: 70%;
+  width: 50%;
+}
+
+.friends-button {
+  height: 49.5%;
+  img {
+    left: 48%;
+  }
+}
+
+.group-button {
+  height: 49.25%;
+}
+
+.planner-button {
+  height: 100%;
+  // width: 66.66%;
+}
+
+.home-button-container {
+  height: 100%;
+}
