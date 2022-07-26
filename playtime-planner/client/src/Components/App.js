@@ -20,7 +20,7 @@ function App() {
     });
   }, []);
 
-  console.log(user);
+  // console.log(user)
   return (
     <stateContext.Provider value={{ user, setUser }}>
       <div className="App">
