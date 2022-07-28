@@ -10,9 +10,22 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.0].define(version: 2022_07_21_194728) do
+ActiveRecord::Schema[7.0].define(version: 2022_07_28_183835) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
+
+  create_table "plans", force: :cascade do |t|
+    t.bigint "user_id", null: false
+    t.string "plan_name"
+    t.string "plan_description"
+    t.integer "width"
+    t.integer "height"
+    t.integer "left"
+    t.integer "top"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["user_id"], name: "index_plans_on_user_id"
+  end
 
   create_table "users", force: :cascade do |t|
     t.string "username"
@@ -32,4 +45,5 @@ ActiveRecord::Schema[7.0].define(version: 2022_07_21_194728) do
     t.index ["user_id"], name: "index_users_users_on_user_id"
   end
 
+  add_foreign_key "plans", "users"
 end

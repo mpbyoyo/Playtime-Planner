@@ -63,3 +63,52 @@ body {
 .planner-card {
   top: 45%;
 }
+
+.time-planner-container {
+  left: 47.5%;
+  top: 47.4%;
+  height: 70%;
+}
+
+.day-labels {
+  height: 78%;
+  grid-template-columns: repeat(7, minmax(0, 1fr));
+}
+
+.days {
+  padding: 4%;
+  font-size: 1.3vw;
+}
+
+.hour-labels {
+  text-align: right;
+  left: 0%;
+  background-color: transparent;
+  grid-template-rows: repeat(24, minmax(0, 1fr));
+}
+
+.hour-div {
+  font-size: 1.1vw;
+}
+
+.dividers {
+  border: 1px solid #e6e6e6;
+}
+
+.plans {
+  grid-template-columns: repeat(7, minmax(0, 1fr));
+  grid-template-rows: repeat(24, minmax(0, 1fr));
+}
+
+.noselect {
+  -webkit-touch-callout: none; /* iOS Safari */
+  -webkit-user-select: none; /* Safari */
+  -khtml-user-select: none; /* Konqueror HTML */
+  -moz-user-select: none; /* Old versions of Firefox */
+  -ms-user-select: none; /* Internet Explorer/Edge */
+  user-select: none; /* Non-prefixed version, currently
+                                  supported by Chrome, Edge, Opera and Firefox */
+}
+
+.preview-plan {
+}

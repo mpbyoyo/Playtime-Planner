@@ -1,6 +1,8 @@
 class UserSerializer < ActiveModel::Serializer
   attributes :id, :username, :pfp, :friend_list, :pending_list
 
+  has_many :plans
+
   def friend_list
     friends = UsersUser.where(friend_id: object.id, pending: false)
     friends.map do |e|

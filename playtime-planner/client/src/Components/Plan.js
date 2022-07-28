@@ -1,23 +1,18 @@
-import React, { useRef } from "react";
+import React, { useRef, useState } from "react";
 
-const Plan = ({ plan }) => {
-  const { width, height, left, top } = plan;
+const Plan = ({ mouseDown, setPlanHover, style }) => {
+  const [styleState, setStyleState] = useState(style);
   const planRef = useRef();
-
-  React.useEffect(() => {
-    planRef.current.style.width = `${width}px`;
-    planRef.current.style.height = `${height}px`;
-    planRef.current.style.left = `${left}%`;
-    planRef.current.style.top = `${top}%`;
-  }, []);
-
-  const handleEdit = () => {};
 
   return (
     <div
-      className="Plan absolute bg-red-200 z-50 hover:scale-105 transition-all"
+      className={`Plan absolute bg-red-200 z-50 hover:scale-105 transition-all rounded-md opacity-60 ${
+        mouseDown && "pointer-events-none"
+      }`}
       ref={planRef}
-      onClick={handleEdit}
+      style={styleState}
+      onMouseEnter={() => setPlanHover(true)}
+      onMouseLeave={() => setPlanHover(false)}
     >
       <div></div>
     </div>
