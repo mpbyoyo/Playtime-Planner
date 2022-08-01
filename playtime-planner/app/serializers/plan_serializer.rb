@@ -1,4 +1,3 @@
 class PlanSerializer < ActiveModel::Serializer
-  attributes :id, :plan_name, :plan_description, :width, :height, :left, :top
-  has_one :User
+  attributes :id, :name, :description, :width, :height, :left, :top
 end

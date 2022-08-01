@@ -6,6 +6,8 @@ import SignupPage from "../Pages/SignupPage";
 import LandingPage from "../Pages/LandingPage";
 import FriendsPage from "../Pages/FriendsPage";
 import PlannerPage from "../Pages/PlannerPage";
+import FriendPlannerPage from "../Pages/FriendPlannerPage";
+import GroupedPlannerPage from "../Pages/GroupedPlannerPage";
 import { Routes, Route } from "react-router-dom";
 
 export const stateContext = createContext();
@@ -20,7 +22,7 @@ function App() {
     });
   }, []);
 
-  console.log(user);
+  // console.log(user);
   return (
     <stateContext.Provider value={{ user, setUser }}>
       <div className="App">
@@ -29,6 +31,14 @@ function App() {
           <Route path="/home" element={user && <HomePage />} />
           <Route path="/friends" element={user && <FriendsPage />} />
           <Route path="/planner" element={user && <PlannerPage />} />
+          <Route
+            path="/planner/:username"
+            element={user && <FriendPlannerPage />}
+          />
+          <Route
+            path="/grouped-planner"
+            element={user && <GroupedPlannerPage />}
+          />
           <Route path="/login" element={<LoginPage />} />
           <Route path="/signup" element={<SignupPage />} />
         </Routes>

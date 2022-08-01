@@ -4,7 +4,7 @@ import PlannerComponent from "../Components/PlannerComponent";
 const Planner = () => {
   return (
     <div className="Planner w-screen h-screen">
-      <PlannerComponent />
+      <PlannerComponent group={false} friend={false} />
     </div>
   );
 };

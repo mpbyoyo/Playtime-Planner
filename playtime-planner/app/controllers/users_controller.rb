@@ -57,6 +57,11 @@ class UsersController < ApplicationController
     end
   end
 
+  def friend_plans
+    friend = User.find_by(username: params[:username])
+    render json: friend.plans, status: :ok
+  end
+
   private
 
   def parameters

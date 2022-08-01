@@ -1,0 +1,2 @@
+class GroupedPlannersController < ApplicationController
+end

@@ -5,5 +5,5 @@ class Plan < ApplicationRecord
   validates :left, presence: true, numericality: { greater_than_or_equal_to: 0 }, numericality: { less_than_or_equal_to: 100 }
   validates :top, presence: true, numericality: { greater_than_or_equal_to: 0 }, numericality: { less_than_or_equal_to: 100 }
 
-  belongs_to :User
+  belongs_to :user
 end

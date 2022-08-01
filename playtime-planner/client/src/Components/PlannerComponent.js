@@ -1,14 +1,18 @@
-import React, { useState, useRef } from "react";
+import React, { useState, useRef, createContext } from "react";
 import Plan from "./Plan";
 import { stateContext } from "./App";
+import { useParams } from "react-router-dom";
 
-const PlannerComponent = () => {
+export const timeContext = createContext();
+
+const PlannerComponent = ({ group, friend }) => {
   const [mousePos, setMousePos] = useState([0, 0]);
   const [topLeft, setTopLeft] = useState([0, 0]);
   const [plans, setPlans] = useState([]);
   const [mouseDown, setMouseDown] = useState(false);
   const [planHover, setPlanHover] = useState(false);
-  const { user } = React.useContext(stateContext);
+  const { user, setUser } = React.useContext(stateContext);
+  const { username } = useParams();
   const plannerRef = useRef();
   const previewRef = useRef();
 
@@ -22,11 +26,50 @@ const PlannerComponent = () => {
   }, [mouseDown]);
 
   React.useEffect(() => {
-    setPlans([...plans, user.plans]);
+    if (!group && !friend) {
+      fetch("/me")
+        .then((r) => r.json())
+        .then(setUser);
+      if (user.plans[0] && !group) {
+        setPlans([
+          ...user.plans.map((e) => ({
+            ...e,
+            top: parseInt(e.top) - getTimeZoneTopPercentOffset(),
+          })),
+        ]);
+      }
+    } else if (friend) {
+      fetch(`/user/${username}/plans`)
+        .then((r) => r.json())
+        .then((d) => {
+          setPlans([
+            ...d.map((e) => ({
+              ...e,
+              top: parseInt(e.top) - getTimeZoneTopPercentOffset(),
+            })),
+          ]);
+        });
+    }
   }, []);
+
+  const getTimezoneOffset = () => {
+    const timezone = new Date().getTimezoneOffset() / 60;
+    return timezone;
+  };
+
+  const getTimeZoneTopPercentOffset = () => {
+    const timezone = getTimezoneOffset();
+    const percentOffset = timezone * 4.16666666667;
+    const modPercentOffset = percentOffset % 100;
+    return modPercentOffset;
+  };
 
   const roundToNearest14 = (num) => {
     return Math.round(num / 14.2857142857) * 14.2857142857;
+  };
+
+  const roundDownToNearest14 = (num) => {
+    return Math.floor(num / 14.2857142857) * 14.2857142857;
   };
 
   const handleMouseMove = (e) => {
@@ -44,9 +87,11 @@ const PlannerComponent = () => {
       const previewHeight = Math.abs(relY - topLeft[1]);
       const previewX = relX < topLeft[0] ? relX : topLeft[0];
       const previewY = relY < topLeft[1] ? relY : topLeft[1];
-      previewRef.current.style.width = `${roundToNearest14(previewWidth)}%`;
+      previewRef.current.style.width = `${
+        roundToNearest14(previewWidth) + 14.2857142857
+      }%`;
       previewRef.current.style.height = `${previewHeight}%`;
-      previewRef.current.style.left = `${roundToNearest14(previewX)}%`;
+      previewRef.current.style.left = `${roundDownToNearest14(previewX)}%`;
       previewRef.current.style.top = `${previewY}%`;
     }
   };
@@ -59,7 +104,6 @@ const PlannerComponent = () => {
       previewRef.current.style.top = `${pos[1]}%`;
       previewRef.current.style.left = `${pos[0]}%`;
       previewRef.current.style.width = `${roundToNearest14(pos[0])}%`;
-      console.log(pos);
     }
   };
 
@@ -73,13 +117,15 @@ const PlannerComponent = () => {
       const smallerY = tl[1] < br[1] ? tl[1] : br[1];
 
       const newPlan = {
-        width: roundToNearest14(Math.abs(tl[0] - br[0])) - 1,
+        width: roundToNearest14(Math.abs(tl[0] - br[0])) + 13.2857142857,
         height: Math.abs(tl[1] - br[1]),
-        left: roundToNearest14(smallerX) + 0.5,
+        left: roundDownToNearest14(smallerX) + 0.5,
         top: smallerY,
       };
 
-      setPlans((v) => [...v, newPlan]);
+      if (Math.abs(tl[1] - pos[1]) >= 3.5) {
+        setPlans((v) => [...v, newPlan]);
+      }
       setMouseDown(false);
     }
   };
@@ -90,48 +136,93 @@ const PlannerComponent = () => {
     }
   };
 
+  const roundToNearest30Min = (num) => {
+    return Math.round(num / 4.16666666667);
+  };
+
+  const getStartTime = (obj) => {
+    const startTime = roundToNearest30Min(obj.top);
+    return startTime;
+  };
+
+  const getEndTime = (obj) => {
+    const endTime = roundToNearest30Min(
+      parseInt(obj.top) + parseInt(obj.height)
+    );
+    return endTime;
+  };
+
+  const timeRange = (obj) => {
+    const startTime = getStartTime(obj) + 1;
+    const startHour = startTime % 12 === 0 ? 12 : startTime % 12;
+    const startAmPm = Math.floor(startTime / 12) % 2 !== 0 ? "pm" : "am";
+    const start = `${startHour}:00${startAmPm}`;
+
+    const endTime = getEndTime(obj);
+    const endHour = endTime % 12 === 0 ? 12 : endTime % 12;
+    const endAmPm = Math.floor(endTime / 12) % 2 !== 0 ? "pm" : "am";
+    const end = `${endHour}:00${endAmPm}`;
+
+    return `${start} - ${end}`;
+  };
+
   return (
     <div className="PlannerComponent absolute h-screen w-screen rounded-sm noselect">
+      <div
+        className={`planner-card planner-background card h-5/6 w-10/12 absolute left-1/2 -translate-x-1/2 -translate-y-1/2 grid grid-flow-row pointer-events-none bg-base-300`}
+      />
       <div
         className={`planner-card day-labels card h-5/6 w-8/12 absolute left-1/2 -translate-x-1/2 -translate-y-1/2 grid grid-flow-row pointer-events-none`}
       >
         {<DaysOfWeek />}
       </div>
-      <div className="time-planner-container overflow-y-scroll overflow-x-hidden h-4/6 w-9/12 absolute top-1/2 -translate-x-1/2 -translate-y-1/2">
+      <div className="time-planner-container rounded-md overflow-y-scroll overflow-x-hidden h-4/6 w-9/12 absolute top-1/2 -translate-x-1/2 -translate-y-1/2">
         <div
           className={`hour-labels card bg-neutral h-screen absolute top-0 grid grid-flow-col rounded-none`}
         >
           {<HourDivs />}
         </div>
         <div
-          className={`plans card bg-base-300 h-screen w-11/12 absolute right-0 grid`}
-          onMouseMove={handleMouseMove}
-          onMouseDown={handleMouseDown}
-          onMouseUp={handleMouseUp}
-          onMouseLeave={handleMouseLeave}
+          className={`plans card bg-base-300 h-screen w-11/12 absolute right-0 grid overflow-visible z-20`}
+          onMouseMove={!group && !friend && handleMouseMove}
+          onMouseDown={!group && !friend && handleMouseDown}
+          onMouseUp={!group && !friend && handleMouseUp}
+          onMouseLeave={!group && !friend && handleMouseLeave}
           ref={plannerRef}
         >
           <div
-            className={`preview-plan absolute opacity-40 bg-red-50`}
+            className={`preview-plan absolute opacity-40 bg-red-50 text-primary-content`}
             ref={previewRef}
-          />
-          <HundredDivs />
-          <div className="card-body absolute w-full h-full">
-            {plans.map((plan, i) => (
-              <Plan
-                key={i}
-                mouseDown={mouseDown}
-                setPlanHover={setPlanHover}
-                mousePos={mousePos}
-                style={{
-                  width: `${plan.width}%`,
-                  height: `${plan.height}%`,
-                  left: `${plan.left}%`,
-                  top: `${plan.top}%`,
-                }}
-              />
-            ))}
+          >
+            {mouseDown && (
+              <p className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2">
+                {timeRange({
+                  top: topLeft[1] < mousePos[1] ? topLeft[1] : mousePos[1],
+                  height: Math.abs(topLeft[1] - mousePos[1]),
+                })}
+              </p>
+            )}
           </div>
+          <GridDivs />
+          <timeContext.Provider
+            value={{ timeRange, getTimeZoneTopPercentOffset }}
+          >
+            <div className="card-body absolute w-full h-full">
+              {plans[0] &&
+                plans.map((plan, i) => (
+                  <Plan
+                    key={i}
+                    e={plan}
+                    mouseDown={mouseDown}
+                    setPlanHover={setPlanHover}
+                    mousePos={mousePos}
+                    group={group}
+                    friend={friend}
+                    setPlans={setPlans}
+                  />
+                ))}
+            </div>
+          </timeContext.Provider>
         </div>
       </div>
     </div>
@@ -185,7 +276,7 @@ const DaysOfWeek = () => {
   return daysOfWeek;
 };
 
-const HundredDivs = () => {
+const GridDivs = () => {
   const divs = [];
   for (let i = 0; i < 168; i++) {
     divs.push(<div key={i} className="dividers opacity-5" />);

@@ -12,7 +12,7 @@ const Home = () => {
   };
 
   const toPlanners = () => {
-    navigate("/planners");
+    navigate("/grouped-planner");
   };
 
   const toPlanner = () => {
