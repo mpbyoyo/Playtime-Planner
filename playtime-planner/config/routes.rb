@@ -1,5 +1,5 @@
 Rails.application.routes.draw do
-  resources :grouped_planners
+  resources :user_groups
   resources :plans
   post '/login', to: 'sessions#create'
   delete '/logout', to: 'sessions#destroy'
@@ -16,4 +16,9 @@ Rails.application.routes.draw do
   post '/plans', to: 'plans#create'
   patch '/plans/:id', to: 'plans#update'
   delete '/plans/:id', to: 'plans#destroy'
+
+  get '/groups', to: 'grouped_planners#index'
+  post '/groups', to: 'grouped_planners#create'
+  patch '/groups/:id', to: 'grouped_planners#update'
+  delete '/groups/:id', to: 'grouped_planners#destroy'
 end

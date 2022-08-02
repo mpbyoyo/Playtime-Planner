@@ -1,5 +1,6 @@
 import React, { useRef, useState } from "react";
 import { timeContext } from "./PlannerComponent";
+import { stateContext } from "./App";
 
 const Plan = ({ mouseDown, setPlanHover, group, friend, e, setPlans }) => {
   const [plan, setPlan] = useState({
@@ -10,6 +11,7 @@ const Plan = ({ mouseDown, setPlanHover, group, friend, e, setPlans }) => {
   const [details, setDetails] = useState(false);
   const { timeRange, getTimeZoneTopPercentOffset } =
     React.useContext(timeContext);
+  const { user } = React.useContext(stateContext);
   const planRef = useRef();
   const cardRef = useRef();
   const editable = !group && !friend;
@@ -115,6 +117,8 @@ const Plan = ({ mouseDown, setPlanHover, group, friend, e, setPlans }) => {
     }
   };
 
+  const groupNameLabel =
+    user.friend_list.filter((friend) => friend.id === e.user_id)[0] || user;
   return (
     <div
       className={`Plan absolute bg-primary hover:scale-105 focus:scale-105 focus:z-50 hover:z-50 transition-transform rounded-md opacity-40 hover:opacity-80 focus:opacity-80 ${
@@ -137,6 +141,11 @@ const Plan = ({ mouseDown, setPlanHover, group, friend, e, setPlans }) => {
           e.description || !editable ? "overflow-hidden" : "overflow-visible"
         }`}
       >
+        {group && (
+          <div className="text-primary-content text-2xl font-semibold absolute top-8 right-2">
+            {groupNameLabel.username}
+          </div>
+        )}
         <form onSubmit={handleSubmit}>
           <div className="card-body p-1">
             <h2 className="card-title">
@@ -158,9 +167,9 @@ const Plan = ({ mouseDown, setPlanHover, group, friend, e, setPlans }) => {
                 />
               )}
             </h2>
-            <div>
+            <div className="text-primary-content event-desc break-words w-[20vw]">
               {e.description || !editable ? (
-                <p className="text-primary-content event-desc">
+                <p className="w-full h-full">
                   {e.description || "No description"}
                 </p>
               ) : (

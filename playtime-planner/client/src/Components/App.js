@@ -1,5 +1,6 @@
 import { useState, useEffect, createContext } from "react";
 import "../scss/App.scss";
+import Chat from "./Chat";
 import HomePage from "../Pages/HomePage";
 import LoginPage from "../Pages/LoginPage";
 import SignupPage from "../Pages/SignupPage";
@@ -42,6 +43,7 @@ function App() {
           <Route path="/login" element={<LoginPage />} />
           <Route path="/signup" element={<SignupPage />} />
         </Routes>
+        {/* {user && <Chat />} */}
       </div>
     </stateContext.Provider>
   );

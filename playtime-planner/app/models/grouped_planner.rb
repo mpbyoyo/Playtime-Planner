@@ -1,3 +1,6 @@
 class GroupedPlanner < ApplicationRecord
-  has_and_belongs_to_many :users
+  validates :name, presence: true
+  has_many :user_groups
+  has_many :users, through: :user_groups
+  has_many :plans, through: :users
 end

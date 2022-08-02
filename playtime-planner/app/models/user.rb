@@ -4,5 +4,6 @@ class User < ApplicationRecord
 
   has_and_belongs_to_many :friends, class_name: "User", foreign_key: :friend_id
   has_many :plans
-  has_and_belongs_to_many :groups, class_name: "GroupedPlanner", foreign_key: :group_id
+  has_many :user_groups
+  has_many :grouped_planners, through: :user_groups
 end

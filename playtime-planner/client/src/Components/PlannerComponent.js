@@ -49,6 +49,13 @@ const PlannerComponent = ({ group, friend }) => {
             })),
           ]);
         });
+    } else if (group) {
+      setPlans(
+        group.plans.map((e) => ({
+          ...e,
+          top: parseInt(e.top) - getTimeZoneTopPercentOffset(),
+        }))
+      );
     }
   }, []);
 
@@ -166,6 +173,10 @@ const PlannerComponent = ({ group, friend }) => {
     return `${start} - ${end}`;
   };
 
+  const handleKeyDown = (e) => {
+    console.log(1);
+  };
+
   return (
     <div className="PlannerComponent absolute h-screen w-screen rounded-sm noselect">
       <div
@@ -184,10 +195,11 @@ const PlannerComponent = ({ group, friend }) => {
         </div>
         <div
           className={`plans card bg-base-300 h-screen w-11/12 absolute right-0 grid overflow-visible z-20`}
-          onMouseMove={!group && !friend && handleMouseMove}
-          onMouseDown={!group && !friend && handleMouseDown}
-          onMouseUp={!group && !friend && handleMouseUp}
-          onMouseLeave={!group && !friend && handleMouseLeave}
+          onMouseMove={!group && !friend ? handleMouseMove : () => {}}
+          onMouseDown={!group && !friend ? handleMouseDown : () => {}}
+          onMouseUp={!group && !friend ? handleMouseUp : () => {}}
+          onMouseLeave={!group && !friend ? handleMouseLeave : () => {}}
+          onKeyDown={group && !friend ? handleKeyDown : () => {}}
           ref={plannerRef}
         >
           <div

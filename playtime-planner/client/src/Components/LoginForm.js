@@ -22,22 +22,24 @@ const LoginForm = () => {
         "Content-Type": "application/json",
       },
       body: JSON.stringify(loginData),
-    })
-      .then((r) => r.json())
-      .then((d) => {
-        if (d.errors && d.errors[0] === "Invalid username or password") {
-          setInvalidLoginData(true);
-        } else if (d.errors) {
-          alert("Unknown error");
-        } else {
-          navigate("/home");
-          setUser(d);
-          setloginData({
-            username: "",
-            password: "",
-          });
-        }
-      });
+    }).then((r) => {
+      if (r.ok) {
+        r.json().then((d) => {
+          if (d.errors && d.errors[0] === "Invalid username or password") {
+            setInvalidLoginData(true);
+          } else if (d.errors) {
+            alert("Unknown error");
+          } else {
+            navigate("/home");
+            setUser(d);
+            setloginData({
+              username: "",
+              password: "",
+            });
+          }
+        });
+      }
+    });
   };
 
   const handleChange = (e) => {
