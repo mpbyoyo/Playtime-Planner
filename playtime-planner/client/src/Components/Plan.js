@@ -2,7 +2,15 @@ import React, { useRef, useState } from "react";
 import { timeContext } from "./PlannerComponent";
 import { stateContext } from "./App";
 
-const Plan = ({ mouseDown, setPlanHover, group, friend, e, setPlans }) => {
+const Plan = ({
+  mouseDown,
+  setPlanHover,
+  group,
+  friend,
+  e,
+  setPlans,
+  focusedUser,
+}) => {
   const [plan, setPlan] = useState({
     ...e,
     name: e.name || "",
@@ -121,7 +129,15 @@ const Plan = ({ mouseDown, setPlanHover, group, friend, e, setPlans }) => {
     user.friend_list.filter((friend) => friend.id === e.user_id)[0] || user;
   return (
     <div
-      className={`Plan absolute bg-primary hover:scale-105 focus:scale-105 focus:z-50 hover:z-50 transition-transform rounded-md opacity-40 hover:opacity-80 focus:opacity-80 ${
+      className={`Plan absolute bg-primary ${
+        group && focusedUser && focusedUser === e.user_id
+          ? "opacity-80"
+          : "opacity-40"
+      } ${
+        group && focusedUser && focusedUser === e.user_id && "scale-105 z-50"
+      } ${
+        !focusedUser && "hover:scale-105 hover:opacity-80 hover:z-50"
+      } transition-transform rounded-md focus:opacity-80 ${
         mouseDown && "pointer-events-none"
       } ${e.description || !editable ? "overflow-hidden" : "overflow-visible"}`}
       ref={planRef}
@@ -142,7 +158,7 @@ const Plan = ({ mouseDown, setPlanHover, group, friend, e, setPlans }) => {
         }`}
       >
         {group && (
-          <div className="text-primary-content text-2xl font-semibold absolute top-8 right-2">
+          <div className="text-primary-content text-md font-semibold absolute top-6 left-1">
             {groupNameLabel.username}
           </div>
         )}
@@ -167,16 +183,21 @@ const Plan = ({ mouseDown, setPlanHover, group, friend, e, setPlans }) => {
                 />
               )}
             </h2>
-            <div className="text-primary-content event-desc break-words w-[20vw]">
+            <div
+              className={`divider bg-opacity-20 bg-black h-[2px] ${
+                group ? "mb-[-1rem]" : "mb-[-0.5rem]"
+              } w-[94%] self-center ${!group && "-mt-[0.5%]"}`}
+            />
+            <div className={`event-desc break-words w-full ${group && "mt-2"}`}>
               {e.description || !editable ? (
-                <p className="w-full h-full">
+                <p className="w-[70%] h-full text-primary-content">
                   {e.description || "No description"}
                 </p>
               ) : (
                 <textarea
                   type="text"
                   name="description"
-                  className="w-full input input-bordered p-1"
+                  className="w-full input input-bordered p-1 "
                   value={plan.description}
                   onChange={handleChange}
                   placeholder="Description"

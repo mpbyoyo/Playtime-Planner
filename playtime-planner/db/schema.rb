@@ -16,8 +16,10 @@ ActiveRecord::Schema[7.0].define(version: 2022_08_02_143547) do
 
   create_table "grouped_planners", force: :cascade do |t|
     t.string "name"
+    t.bigint "user_id", null: false
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.index ["user_id"], name: "index_grouped_planners_on_user_id"
   end
 
   create_table "plans", force: :cascade do |t|
@@ -60,6 +62,7 @@ ActiveRecord::Schema[7.0].define(version: 2022_08_02_143547) do
     t.index ["user_id"], name: "index_users_users_on_user_id"
   end
 
+  add_foreign_key "grouped_planners", "users"
   add_foreign_key "plans", "users"
   add_foreign_key "user_groups", "grouped_planners"
   add_foreign_key "user_groups", "users"

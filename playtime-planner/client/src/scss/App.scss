@@ -83,13 +83,13 @@ body {
 
 .hour-labels {
   text-align: right;
-  left: 0%;
+  left: 2.5%;
   background-color: transparent;
   grid-template-rows: repeat(24, minmax(0, 1fr));
 }
 
 .hour-div {
-  font-size: 1.1vw;
+  font-size: 0.9vw;
 }
 
 .dividers {

@@ -5,7 +5,7 @@ import { useParams } from "react-router-dom";
 
 export const timeContext = createContext();
 
-const PlannerComponent = ({ group, friend }) => {
+const PlannerComponent = ({ group, friend, focusedUser }) => {
   const [mousePos, setMousePos] = useState([0, 0]);
   const [topLeft, setTopLeft] = useState([0, 0]);
   const [plans, setPlans] = useState([]);
@@ -57,7 +57,7 @@ const PlannerComponent = ({ group, friend }) => {
         }))
       );
     }
-  }, []);
+  }, [group]);
 
   const getTimezoneOffset = () => {
     const timezone = new Date().getTimezoneOffset() / 60;
@@ -143,32 +143,49 @@ const PlannerComponent = ({ group, friend }) => {
     }
   };
 
-  const roundToNearest30Min = (num) => {
-    return Math.round(num / 4.16666666667);
+  const roundToNearest15Min = (num) => {
+    return Math.round(num / 1.04166666667);
   };
 
   const getStartTime = (obj) => {
-    const startTime = roundToNearest30Min(obj.top);
+    const startTime = roundToNearest15Min(obj.top);
     return startTime;
   };
 
   const getEndTime = (obj) => {
-    const endTime = roundToNearest30Min(
-      parseInt(obj.top) + parseInt(obj.height)
+    const endTime = roundToNearest15Min(
+      parseInt(obj.top) + parseInt(obj.height) + 1
     );
     return endTime;
   };
 
   const timeRange = (obj) => {
-    const startTime = getStartTime(obj) + 1;
+    const startTime = (getStartTime(obj) + 4) / 4;
     const startHour = startTime % 12 === 0 ? 12 : startTime % 12;
     const startAmPm = Math.floor(startTime / 12) % 2 !== 0 ? "pm" : "am";
-    const start = `${startHour}:00${startAmPm}`;
+    const startMins =
+      startTime % 1 === 0
+        ? "00"
+        : startTime % 0.5 === 0
+        ? "30"
+        : Math.round(startTime) > Math.floor(startTime)
+        ? "45"
+        : "15";
+    const start = `${Math.floor(startHour) || 12}:${startMins}${startAmPm}`;
+    console.log(startTime, startHour, startAmPm, start);
 
-    const endTime = getEndTime(obj);
+    const endTime = (getEndTime(obj) + 4) / 4;
     const endHour = endTime % 12 === 0 ? 12 : endTime % 12;
     const endAmPm = Math.floor(endTime / 12) % 2 !== 0 ? "pm" : "am";
-    const end = `${endHour}:00${endAmPm}`;
+    const endMins =
+      endTime % 1 === 0
+        ? "00"
+        : endTime % 0.5 === 0
+        ? "30"
+        : Math.round(endTime) > Math.floor(endTime)
+        ? "45"
+        : "15";
+    const end = `${Math.floor(endHour) || 12}:${endMins}${endAmPm}`;
 
     return `${start} - ${end}`;
   };
@@ -189,12 +206,12 @@ const PlannerComponent = ({ group, friend }) => {
       </div>
       <div className="time-planner-container rounded-md overflow-y-scroll overflow-x-hidden h-4/6 w-9/12 absolute top-1/2 -translate-x-1/2 -translate-y-1/2">
         <div
-          className={`hour-labels card bg-neutral h-screen absolute top-0 grid grid-flow-col rounded-none`}
+          className={`hour-labels card bg-neutral h-screen absolute top-0 grid grid-flow-col rounded-none overflow-visible`}
         >
           {<HourDivs />}
         </div>
         <div
-          className={`plans card bg-base-300 h-screen w-11/12 absolute right-0 grid overflow-visible z-20`}
+          className={`plans card bg-base-300 h-screen w-11/12 absolute right-0 grid overflow-visible z-20 top-[2.1%]`}
           onMouseMove={!group && !friend ? handleMouseMove : () => {}}
           onMouseDown={!group && !friend ? handleMouseDown : () => {}}
           onMouseUp={!group && !friend ? handleMouseUp : () => {}}
@@ -231,6 +248,7 @@ const PlannerComponent = ({ group, friend }) => {
                     group={group}
                     friend={friend}
                     setPlans={setPlans}
+                    focusedUser={focusedUser}
                   />
                 ))}
             </div>
