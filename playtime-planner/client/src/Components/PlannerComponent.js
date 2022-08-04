@@ -231,7 +231,12 @@ const PlannerComponent = ({ group, friend, focusedUser }) => {
           </div>
           <GridDivs />
           <timeContext.Provider
-            value={{ timeRange, getTimeZoneTopPercentOffset }}
+            value={{
+              timeRange,
+              getTimeZoneTopPercentOffset,
+              getTimezoneOffset,
+              roundToNearest14,
+            }}
           >
             <div className="card-body absolute w-full h-full">
               {plans[0] &&
@@ -246,6 +251,7 @@ const PlannerComponent = ({ group, friend, focusedUser }) => {
                     friend={friend}
                     setPlans={setPlans}
                     focusedUser={focusedUser}
+                    getTimezoneOffset={getTimezoneOffset}
                   />
                 ))}
             </div>

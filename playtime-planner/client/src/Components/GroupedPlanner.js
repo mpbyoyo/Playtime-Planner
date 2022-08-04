@@ -24,6 +24,8 @@ const GroupedPlanner = () => {
       { error: false, text: "" },
     ],
   });
+  const [noNameError, setNoNameError] = useState(false);
+  const [noFriendError, setNoFriendError] = useState(false);
   const closeModalRef = React.useRef();
   const contextMenuRef = React.useRef();
 
@@ -77,12 +79,16 @@ const GroupedPlanner = () => {
             });
             closeModalRef.current.click();
           });
+        } else {
+          setNoNameError(true);
         }
       });
+    } else {
+      setNoFriendError(true);
     }
   };
 
-  const handleAddUserToGroup = (e) => {
+  const handleAddUserToGroup = () => {
     setFormData((v) => ({
       ...v,
       users: [...v.users, ""],
@@ -106,6 +112,7 @@ const GroupedPlanner = () => {
   };
 
   const handleKeyDown = (e, i) => {
+    console.log(e.key);
     if (e.key === "Backspace" && formData.users.length > 2) {
       const users = [...formData.users];
       users.splice(i, 1);
@@ -113,6 +120,9 @@ const GroupedPlanner = () => {
         ...v,
         users,
       }));
+    } else if (e.key === "Tab" && i === formData.users.length - 1) {
+      e.preventDefault();
+      handleAddUserToGroup();
     }
   };
 
@@ -172,6 +182,14 @@ const GroupedPlanner = () => {
   const closeDrawer = () => {
     if (!pinDrawer) {
       setDrawer(false);
+    }
+  };
+
+  const errorTest = () => {
+    if (noNameError) {
+      return "Please enter a group name!";
+    } else if (noFriendError) {
+      return "We can't find that user in your friends list!";
     }
   };
 
@@ -379,6 +397,17 @@ const GroupedPlanner = () => {
               <label
                 htmlFor="group-creation-modal"
                 className="btn btn-success text-success-content new-group w-2/3 self-center modal-button"
+                onClick={() => {
+                  setFormData({
+                    name: "",
+                    users: [
+                      { error: false, text: `${user.username}` },
+                      { error: false, text: "" },
+                    ],
+                  });
+                  setNoFriendError(false);
+                  setNoNameError(false);
+                }}
               >
                 Create Grouped Planner
               </label>
@@ -406,6 +435,7 @@ const GroupedPlanner = () => {
                 value={formData.name}
                 onChange={(e) => {
                   setFormData({ ...formData, name: e.target.value });
+                  setNoNameError(false);
                 }}
               />
             </div>
@@ -425,13 +455,12 @@ const GroupedPlanner = () => {
                     }`}
                     placeholder="Enter a friend's username"
                     value={formData.users[i].text}
-                    onChange={
-                      i > 0
-                        ? (ev) => {
-                            handleChangeUsersArray(i, ev.target.value);
-                          }
-                        : () => {}
-                    }
+                    onChange={(ev) => {
+                      setNoFriendError(false);
+                      if (i > 0) {
+                        handleChangeUsersArray(i, ev.target.value);
+                      }
+                    }}
                     onKeyDown={
                       !formData.users[i]
                         ? (ev) => handleKeyDown(ev, i)
@@ -457,11 +486,38 @@ const GroupedPlanner = () => {
                 htmlFor="group-creation-modal"
                 className="btn"
                 ref={closeModalRef}
+                onClick={() => {
+                  setNoNameError(false);
+                  setNoFriendError(false);
+                }}
               >
                 cancel
               </label>
             </div>
           </form>
+        </div>
+      </div>
+
+      <div
+        className={`alert alert-error shadow-lg absolute ${
+          noNameError || noFriendError ? "bottom-5" : "-bottom-14"
+        }  transition-all w-1/2 left-1/2 -translate-x-1/2`}
+      >
+        <div>
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            className="stroke-current flex-shrink-0 h-6 w-6"
+            fill="none"
+            viewBox="0 0 24 24"
+          >
+            <path
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              strokeWidth="2"
+              d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z"
+            />
+          </svg>
+          <span>{errorTest()}</span>
         </div>
       </div>
     </div>

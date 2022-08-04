@@ -17,8 +17,12 @@ const Plan = ({
     description: "",
   });
   const [details, setDetails] = useState(false);
-  const { timeRange, getTimeZoneTopPercentOffset } =
-    React.useContext(timeContext);
+  const {
+    timeRange,
+    getTimeZoneTopPercentOffset,
+    getTimezoneOffset,
+    roundToNearest14,
+  } = React.useContext(timeContext);
   const { user } = React.useContext(stateContext);
   const planRef = useRef();
   const cardRef = useRef();
@@ -30,9 +34,10 @@ const Plan = ({
 
   const getDaysBetween = (created_at) => {
     const today = new Date();
-    const created_at_unix = getUnixTime(created_at);
+    const created_at_unix =
+      getUnixTime(created_at) - getTimezoneOffset() * 3600;
     const created_at_day = Math.floor(created_at_unix / 86400) * 86400;
-    const today_unix = getUnixTime(today);
+    const today_unix = getUnixTime(today) - getTimezoneOffset() * 3600;
     const today_day = Math.floor(today_unix / 86400) * 86400;
     return Math.floor((today_day - created_at_day) / 86400);
   };
@@ -40,6 +45,8 @@ const Plan = ({
   const correctTimePassageOverflow = () => {
     const movedLeft =
       parseInt(plan.left) - getDaysBetween(plan.created_at) * 14.2857142857;
+    // parseInt(plan.left) - 1 * 14.2857142857;
+
     if (movedLeft < 0) {
       if (parseInt(plan.width) + movedLeft <= 0) {
         fetch(`/plans/${plan.id}`, {
@@ -57,15 +64,16 @@ const Plan = ({
           },
           body: JSON.stringify({
             left: 0,
-            width: parseInt(plan.width) + movedLeft,
+            width: roundToNearest14(parseInt(plan.width) + movedLeft),
           }),
         }).then((r) => {
           if (r.ok) {
             r.json().then((d) => {
               setPlan({
                 ...plan,
+                top: parseInt(d.top) - getTimeZoneTopPercentOffset(),
                 left: 0,
-                width: parseInt(plan.width) + movedLeft,
+                width: roundToNearest14(parseInt(plan.width) + movedLeft),
               });
               setPlans((v) =>
                 v.map((e) => {
@@ -91,7 +99,11 @@ const Plan = ({
       }).then((r) => {
         if (r.ok) {
           r.json().then((d) => {
-            setPlan({ ...plan, left: movedLeft });
+            setPlan({
+              ...plan,
+              top: parseInt(d.top) - getTimeZoneTopPercentOffset(),
+              left: movedLeft,
+            });
             setPlans((v) =>
               v.map((e) => {
                 if (e.id === d.id) {
@@ -107,7 +119,9 @@ const Plan = ({
   };
 
   React.useEffect(() => {
-    correctTimePassageOverflow();
+    if (e.id) {
+      correctTimePassageOverflow();
+    }
   }, []);
 
   React.useEffect(() => {
@@ -131,7 +145,9 @@ const Plan = ({
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify(plan),
+        body: JSON.stringify({
+          ...plan,
+        }),
       }).then((r) => {
         if (r.ok) {
           r.json().then((d) => {
@@ -163,7 +179,7 @@ const Plan = ({
             );
             setPlans((v) => [
               ...v,
-              { ...d, top: d.top - getTimeZoneTopPercentOffset() },
+              { ...d, top: parseInt(d.top) - getTimeZoneTopPercentOffset() },
             ]);
           });
         }
@@ -231,7 +247,7 @@ const Plan = ({
         width: `${e.width}%`,
         height: `${e.height}%`,
         left: `${e.left}%`,
-        top: `${e.top}%`,
+        top: `${plan.top}%`,
       }}
       onClick={handleClick}
       onMouseEnter={() => setPlanHover(true)}
@@ -255,7 +271,7 @@ const Plan = ({
                 <>
                   <p className="text-primary-content event-name">{e.name}</p>
                   <p className="text-primary-content text-xs font-bold time-range text-right pr-1">
-                    {timeRange(e)}
+                    {timeRange(plan)}
                   </p>
                 </>
               ) : (
