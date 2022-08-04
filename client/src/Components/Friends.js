@@ -13,15 +13,19 @@ const Friends = () => {
     areFreinds: false,
     unreal: false,
   });
+  const [friended, setFriended] = useState(false);
 
   useEffect(() => {
-    setTimeout(() => {
-      setErrors({
-        self: false,
-        areFreinds: false,
-        unreal: false,
-      });
-    }, 3250);
+    if (Object.values(errors).includes(true) || friended) {
+      setTimeout(() => {
+        setErrors({
+          self: false,
+          areFreinds: false,
+          unreal: false,
+        });
+        setFriended(false);
+      }, 3250);
+    }
   }, [updater]);
 
   const handleChange = (e) => {
@@ -43,6 +47,8 @@ const Friends = () => {
           r.json()
             .then((d) => setUser(d))
             .then(setSearch(""));
+          setFriended(true);
+          setUpdater((v) => !v);
         } else if (r.status === 404) {
           setErrors((v) => ({
             ...v,
@@ -86,6 +92,8 @@ const Friends = () => {
       return "This user is already your friend!";
     } else if (errors.unreal) {
       return "Sorry, we can't find this user.";
+    } else if (friended) {
+      return "Friend request sent!";
     }
   };
 
@@ -134,24 +142,45 @@ const Friends = () => {
         </div>
       </div>
       <div
-        className={`alert alert-error shadow-lg absolute ${
-          Object.values(errors).includes(true) ? "bottom-5" : "-bottom-14"
+        className={`alert ${
+          friended ? "alert-success" : "alert-error"
+        } shadow-lg absolute ${
+          Object.values(errors).includes(true) || friended
+            ? "bottom-5"
+            : "-bottom-14"
         }  transition-all w-1/2 left-1/2 -translate-x-1/2`}
       >
         <div>
-          <svg
-            xmlns="http://www.w3.org/2000/svg"
-            className="stroke-current flex-shrink-0 h-6 w-6"
-            fill="none"
-            viewBox="0 0 24 24"
-          >
-            <path
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              strokeWidth="2"
-              d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z"
-            />
-          </svg>
+          {!friended ? (
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              className="stroke-current flex-shrink-0 h-6 w-6"
+              fill="none"
+              viewBox="0 0 24 24"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth="2"
+                d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z"
+              />
+            </svg>
+          ) : (
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              className="stroke-current flex-shrink-0 h-6 w-6"
+              fill="none"
+              viewBox="0 0 24 24"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth="2"
+                d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"
+              />
+            </svg>
+          )}
+
           <span>{errMessage()}</span>
         </div>
       </div>
