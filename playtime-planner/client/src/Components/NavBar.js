@@ -1,6 +1,7 @@
 import React, { useContext } from "react";
 import { Link, useNavigate, useLocation } from "react-router-dom";
 import { stateContext } from "./App";
+import undraw_male_avatar_323b from "../icons/undraw_male_avatar_323b.svg";
 
 const NavBar = () => {
   const navigate = useNavigate();
@@ -69,6 +70,17 @@ const NavBar = () => {
         <button className="btn" onClick={handleLogout}>
           Logout
         </button>
+        <figure className="pl-6 pr-3">
+          <div className="avatar">
+            <div className="w-10 rounded-full ring ring-primary ring-offset-2 ring-offset-base-100">
+              <img
+                src={user.pfp || undraw_male_avatar_323b}
+                alt="pfp"
+                className="w-full pointer-events-none"
+              />
+            </div>
+          </div>
+        </figure>
       </div>
     </div>
   );
