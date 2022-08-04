@@ -27,7 +27,6 @@ function App() {
       .then(() => setLoaded(true));
   }, []);
 
-  // console.log(user);
   return (
     loaded && (
       <stateContext.Provider value={{ user, setUser }}>
