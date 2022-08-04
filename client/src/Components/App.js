@@ -13,6 +13,8 @@ import { Routes, Route } from "react-router-dom";
 
 export const stateContext = createContext();
 
+// don't
+
 function App() {
   const [user, setUser] = useState(null);
   useEffect(() => {
