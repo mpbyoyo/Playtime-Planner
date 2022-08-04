@@ -24,6 +24,92 @@ const Plan = ({
   const cardRef = useRef();
   const editable = !group && !friend;
 
+  const getUnixTime = (date) => {
+    return new Date(date).getTime() / 1000;
+  };
+
+  const getDaysBetween = (created_at) => {
+    const today = new Date();
+    const created_at_unix = getUnixTime(created_at);
+    const created_at_day = Math.floor(created_at_unix / 86400) * 86400;
+    const today_unix = getUnixTime(today);
+    const today_day = Math.floor(today_unix / 86400) * 86400;
+    return Math.floor((today_day - created_at_day) / 86400);
+  };
+
+  const correctTimePassageOverflow = () => {
+    const movedLeft =
+      parseInt(plan.left) - getDaysBetween(plan.created_at) * 14.2857142857;
+    if (movedLeft < 0) {
+      if (parseInt(plan.width) + movedLeft <= 0) {
+        fetch(`/plans/${plan.id}`, {
+          method: "DELETE",
+        }).then((r) => {
+          if (r.ok) {
+            setPlans((v) => v.filter((e) => e.id !== plan.id));
+          }
+        });
+      } else {
+        fetch(`/plans/${plan.id}`, {
+          method: "PATCH",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            left: 0,
+            width: parseInt(plan.width) + movedLeft,
+          }),
+        }).then((r) => {
+          if (r.ok) {
+            r.json().then((d) => {
+              setPlan({
+                ...plan,
+                left: 0,
+                width: parseInt(plan.width) + movedLeft,
+              });
+              setPlans((v) =>
+                v.map((e) => {
+                  if (e.id === d.id) {
+                    return d;
+                  }
+                  return e;
+                })
+              );
+            });
+          }
+        });
+      }
+    } else if (movedLeft < parseInt(plan.left)) {
+      fetch(`/plans/${plan.id}`, {
+        method: "PATCH",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          left: movedLeft,
+        }),
+      }).then((r) => {
+        if (r.ok) {
+          r.json().then((d) => {
+            setPlan({ ...plan, left: movedLeft });
+            setPlans((v) =>
+              v.map((e) => {
+                if (e.id === d.id) {
+                  return d;
+                }
+                return e;
+              })
+            );
+          });
+        }
+      });
+    }
+  };
+
+  React.useEffect(() => {
+    correctTimePassageOverflow();
+  }, []);
+
   React.useEffect(() => {
     if (mouseDown && !plan.id) {
       setPlans((v) =>

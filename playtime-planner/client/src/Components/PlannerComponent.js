@@ -172,7 +172,6 @@ const PlannerComponent = ({ group, friend, focusedUser }) => {
         ? "45"
         : "15";
     const start = `${Math.floor(startHour) || 12}:${startMins}${startAmPm}`;
-    console.log(startTime, startHour, startAmPm, start);
 
     const endTime = (getEndTime(obj) + 4) / 4;
     const endHour = endTime % 12 === 0 ? 12 : endTime % 12;
@@ -190,9 +189,7 @@ const PlannerComponent = ({ group, friend, focusedUser }) => {
     return `${start} - ${end}`;
   };
 
-  const handleKeyDown = (e) => {
-    console.log(1);
-  };
+  const handleKeyDown = (e) => {};
 
   return (
     <div className="PlannerComponent absolute h-screen w-screen rounded-sm noselect">

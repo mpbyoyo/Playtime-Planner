@@ -17,6 +17,7 @@ class UsersController < ApplicationController
   def update_pfp
     user = User.find(session[:user_id])
     user.update(pfp: params[:pfp])
+    render json: user, status: :ok
   end
 
   def index
