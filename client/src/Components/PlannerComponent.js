@@ -123,10 +123,15 @@ const PlannerComponent = ({ group, friend, focusedUser }) => {
       const smallerX = tl[0] < br[0] ? tl[0] : br[0];
       const smallerY = tl[1] < br[1] ? tl[1] : br[1];
 
+      let width = roundToNearest14(Math.abs(tl[0] - br[0])) + 13.2857142857;
+      const left = roundDownToNearest14(smallerX) + 0.5;
+      if (width + left > 100) {
+        width = 100 - left;
+      }
       const newPlan = {
-        width: roundToNearest14(Math.abs(tl[0] - br[0])) + 13.2857142857,
+        width: width,
         height: Math.abs(tl[1] - br[1]),
-        left: roundDownToNearest14(smallerX) + 0.5,
+        left: left,
         top: smallerY,
       };
 
