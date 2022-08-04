@@ -38,6 +38,8 @@ const LoginForm = () => {
             });
           }
         });
+      } else {
+        setInvalidLoginData(true);
       }
     });
   };
